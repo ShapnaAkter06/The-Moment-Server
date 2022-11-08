@@ -38,7 +38,7 @@ async function run() {
             res.send(services)
         })
 
-        //3.specific id'r jonno
+        //3.specific id API
         app.get('/services/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
@@ -53,18 +53,27 @@ async function run() {
             res.send(result)
         })
 
-        //5 get review
+        //5 get reviews
         app.get('/reviews', async (req, res) => {
-            let query = {}
-            if (req.query.email) {
-                query = {
-                    email: req.query.email
-                }
-            }
+            const name = req.query.email;
+            console.log(name);
+            let query = {name}
             const cursor = reviewCollection.find(query);
             const review = await cursor.toArray();
             res.send(review)
         })
+
+        // app.get('/myReviews', async (req, res) => {
+        //     let query = {}
+        //     if (req.query.email) {
+        //         query = {
+        //             email: req.query.email
+        //         }
+        //     }
+        //     const cursor = reviewCollection.find(query);
+        //     const review = await cursor.toArray();
+        //     res.send(review)
+        // })
 
     } finally {
 
