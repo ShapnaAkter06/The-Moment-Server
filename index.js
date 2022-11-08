@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
@@ -56,24 +57,24 @@ async function run() {
         //5 get reviews
         app.get('/reviews', async (req, res) => {
             const name = req.query.email;
-            console.log(name);
             let query = {name}
             const cursor = reviewCollection.find(query);
             const review = await cursor.toArray();
             res.send(review)
         })
 
-        // app.get('/myReviews', async (req, res) => {
-        //     let query = {}
-        //     if (req.query.email) {
-        //         query = {
-        //             email: req.query.email
-        //         }
-        //     }
-        //     const cursor = reviewCollection.find(query);
-        //     const review = await cursor.toArray();
-        //     res.send(review)
-        // })
+        // my Reviews api
+        app.get('/myReviews', async (req, res) => {
+            let query = {}
+            if (req.query.email) {
+                query = {
+                    email: req.query.email
+                }
+            }
+            const cursor = reviewCollection.find(query);
+            const review = await cursor.toArray();
+            res.send(review)
+        })
 
     } finally {
 
