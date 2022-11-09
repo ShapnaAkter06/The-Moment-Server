@@ -24,6 +24,32 @@ async function run() {
         const serviceCollection = client.db('TheMoments').collection('services');
         const reviewCollection = client.db('TheMoments').collection('reviews')
 
+        function verifyJWT(req, res, next) {
+            const authHeader = req.headers.authorization;
+
+            if (!authHeader) {
+                return res.status(401).send({ message: 'unauthorize access' })
+            }
+
+            const token = authHeader.split(' ')[1];
+
+            jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+                if (err) {
+                    return res.status(403).send({ message: 'Forbidden access' })
+                }
+                req.decoded = decoded;
+                next()
+            })
+        }
+
+        //7. Get JWT Token
+        app.post('/jwt', (req, res) => {
+            const user = req.body;
+            // console.log(user);
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
+            res.send({ token })
+        })
+
         // 1.
         app.get('/home', async (req, res) => {
             const query = {};
