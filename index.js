@@ -24,7 +24,9 @@ async function run() {
         const serviceCollection = client.db('TheMoments').collection('services');
         const reviewCollection = client.db('TheMoments').collection('reviews')
 
+        // jwt token function
         function verifyJWT(req, res, next) {
+            // console.log(req.headers.authorization);
             const authHeader = req.headers.authorization;
 
             if (!authHeader) {
@@ -46,7 +48,7 @@ async function run() {
         app.post('/jwt', (req, res) => {
             const user = req.body;
             // console.log(user);
-            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '10h' });
             res.send({ token })
         })
 
@@ -91,7 +93,13 @@ async function run() {
         })
 
         // my Reviews api
-        app.get('/myReviews', async (req, res) => {
+        app.get('/myReviews', verifyJWT, async (req, res) => {
+            const decoded = req.decoded;
+            console.log(decoded);
+
+            if (decoded.email !== req.query.email) {
+                res.status(403).send({ message: 'unauthorize access' })
+            }
             let query = {}
             if (req.query.email) {
                 query = {
