@@ -79,6 +79,7 @@ async function run() {
         //4. review API
         app.post('/reviews', async (req, res) => {
             const review = req.body;
+            review.date= new Date() 
             const result = await reviewCollection.insertOne(review);
             res.send(result)
         })
@@ -87,7 +88,7 @@ async function run() {
         app.get('/reviews', async (req, res) => {
             const name = req.query.email;
             let query = { name }
-            const cursor = reviewCollection.find(query);
+            const cursor = reviewCollection.find(query).sort({date: -1});
             const review = await cursor.toArray();
             res.send(review)
         })
