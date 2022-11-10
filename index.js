@@ -91,6 +91,16 @@ async function run() {
             const review = await cursor.toArray();
             res.send(review)
         })
+        app.get('/review/:id', async (req, res) => {
+            const id = req.params.id;
+            let query = { _id: ObjectId(id) }
+            const cursor = await reviewCollection.findOne(query);
+            console.log(cursor);
+            console.log(id);
+            console.log(req.query);
+            // const review = await cursor.toArray();
+            res.send(cursor)
+        })
 
         // my Reviews api
         app.get('/myReviews', verifyJWT, async (req, res) => {
@@ -111,13 +121,32 @@ async function run() {
             res.send(review)
         })
 
+        app.put("/update/:id", verifyJWT, async (req, res) => {
+            const id = req.params.id;
+            const update = req.body.edt;
+            const query = { _id: ObjectId(id) };
+            const updatedDoc = {
+                $set: {
+                    message: update,
+                },
+            };
+            const result = await reviewCollection.updateOne(query, updatedDoc);
+            res.send(result);
+        });
+
         //5. delete myReviews API
-        app.delete('/myReviews/:id', async (req, res) => {
+        app.delete('/myReviews/:id', verifyJWT, async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const result = await reviewCollection.deleteOne(query);
             res.send(result)
         })
+        // add service api
+        app.post("/myservice", async (req, res) => {
+            const query = req.body;
+            const result = await serviceCollection.insertOne(query);
+            res.send(result);
+        });
 
     } finally {
 
